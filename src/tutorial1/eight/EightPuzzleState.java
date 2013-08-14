@@ -49,15 +49,17 @@ public class EightPuzzleState implements State {
 	}
 	
 	/**
-	 * Returns a string representation, which is simply
-	 * all nine tile numbers in order with spaces between them.
+	 * Returns a string representation, which uses newlines and
+	 * spaces to display the 2D configuration.
 	 * @return a string representation of the state.
 	 */
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
+		builder.append("\n");
 		for (int i = 0; i < 3; i++) {
+			builder.append("\n");
 			for (int j = 0; j < 3; j++) {
-				if (i > 0 || j > 0) {
+				if (j > 0) {
 					builder.append(" ");
 				}
 				builder.append(grid[i][j]);
@@ -154,7 +156,6 @@ public class EightPuzzleState implements State {
 
 	@Override
 	public List<State> getSuccessors() {
-		// The mapping of successors to costs.
 		List<State> successors = new ArrayList<State>();
 		int emptyRow = getRowOf(0); // The row of the empty tile.
 		int emptyCol = getColOf(0); // The column of the empty tile.

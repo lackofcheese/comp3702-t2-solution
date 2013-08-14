@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import search.algorithms.*;
@@ -13,13 +12,9 @@ import search.heuristics.*;
  * An implementation of the navigation problem from Tutorial 1.
  * @author lackofcheese
  */
-@SuppressWarnings("unused")
-public class NavigationProblem {
+public class NavigationSolver {
 	/** The default file to read input from. */
-	public static final String DEFAULT_INPUT = "src/navigation.in";
-	
-	/** A mapping to store the navigation data. */
-	private static Map<NavigationState, Map<NavigationState, Double>> map = new HashMap<NavigationState, Map<NavigationState, Double>>();
+	public static final String DEFAULT_INPUT = "navigation.in";
 	/** A mapping to remember the states by their names. */
 	private static Map<String, NavigationState> byName = new HashMap<String, NavigationState>();
 	
@@ -71,14 +66,15 @@ public class NavigationProblem {
 		
 		NavigationState initialState = byName.get("78");
 		NavigationState goalState = byName.get("82D");
+		@SuppressWarnings("unused")
 		Heuristic heuristic = new ZeroHeuristic();
 		
 		AbstractSearchAlgorithm algo;
 		//algo = new DepthFirstSearch(initialState, goalState);
-		algo = new DepthLimitedSearch(4, initialState, goalState);
+		//algo = new DepthLimitedSearch(5, initialState, goalState);
 		//algo = new IterativeDeepeningSearch(initialState, goalState);
 		
-		//algo = new BreadthFirstSearch(initialState, goalState);
+		algo = new BreadthFirstSearch(initialState, goalState);
 		//algo = new AStarSearch(initialState, goalState, heuristic);
 		
 		algo.verboseSearch();

@@ -45,24 +45,6 @@ public class NavigationState implements State {
 	}
 	
 	/**
-	 * Returns true if the other state is a NamedState with the same name,
-	 * and false otherwise.
-	 */
-	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof NavigationState)) {
-			return false;
-		}
-		return this.name.equals(((NavigationState)obj).name);
-	}
-	
-	/**
-	 * Returns a hash code for this state, based on its name.
-	 */
-	public int hashCode() {
-		return this.name.hashCode();
-	}
-	
-	/**
 	 * Adds the given state as a successor of the current state, with the given cost.
 	 * @param succ the successor state.
 	 * @param cost the edge cost to the successor state.
