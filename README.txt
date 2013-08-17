@@ -16,15 +16,12 @@ search algorithms mentioned in the lectures so far.
 
 
 (2) Manual compilation and execution
-Alternatively, to compile and run the solutions manually,
-cd to the src folder and run the following commands in order:
-    javac search/*.java
-    javac search/heuristics/*.java
-    javac search/algorithms/*.java
-    javac tutorial1/navigation/*.java
-    javac tutorial1/eight/*.java
+Alternatively, to compile and run the solutions without Eclipse,
+download and install Apache Ant, and then run the command
+    ant
+from the main project folder.
 
 Then the solutions can be run via the following commands:
-    java tutorial1.navigation.NavigationSolver navigation.in
+    java -cp bin tutorial1.navigation.NavigationSolver navigation.in
 OR
-    java tutorial1.eight.EightPuzzleSolver eight.in
+    java -cp bin tutorial1.eight.EightPuzzleSolver eight.in
