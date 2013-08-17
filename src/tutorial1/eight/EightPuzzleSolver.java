@@ -13,7 +13,7 @@ import search.heuristics.*;
  */
 public class EightPuzzleSolver {
 	/** The default file to read input from. */
-	public static final String DEFAULT_INPUT = "src/eight.in";
+	public static final String DEFAULT_INPUT = "eight.in";
 	
 	/** The initial state for the search. */
 	private static EightPuzzleState initialState;

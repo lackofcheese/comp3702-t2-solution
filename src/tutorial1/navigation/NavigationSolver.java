@@ -14,7 +14,7 @@ import search.heuristics.*;
  */
 public class NavigationSolver {
 	/** The default file to read input from. */
-	public static final String DEFAULT_INPUT = "src/navigation.in";
+	public static final String DEFAULT_INPUT = "navigation.in";
 	/** A mapping to remember the states by their names. */
 	private static Map<String, NavigationState> byName = new HashMap<String, NavigationState>();
 	
