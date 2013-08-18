@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import problem.ProblemSpec;
-import problem.RobotArmState;
 import search.State;
 import search.algorithms.*;
 import search.heuristics.*;

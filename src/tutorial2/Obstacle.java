@@ -1,4 +1,4 @@
-package problem;
+package tutorial2;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;

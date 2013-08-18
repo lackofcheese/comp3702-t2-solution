@@ -1,6 +1,5 @@
 package tutorial2;
 
-import problem.RobotArmState;
 import search.State;
 import search.heuristics.Heuristic;
 

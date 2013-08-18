@@ -5,9 +5,6 @@ import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.Random;
 
-import problem.Obstacle;
-import problem.RobotArmState;
-
 public class StateTools {
 	/** The random number generator */
 	public static final Random random = new Random();
