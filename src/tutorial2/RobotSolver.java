@@ -128,6 +128,7 @@ public class RobotSolver {
 
 		Heuristic heuristic;
 		heuristic = new TotalAngleDeltaHeuristic(ps.getGoalState());
+		// heuristic = new ZeroHeuristic();
 
 		AbstractSearchAlgorithm algo;
 		// algo = new DepthFirstSearch(initialState, goalState);
