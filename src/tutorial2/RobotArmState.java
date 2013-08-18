@@ -14,6 +14,7 @@ public class RobotArmState extends StateWithMap {
 	private List<Point2D> points;
 	
 	public RobotArmState(double length1, double length2, double angle1, double angle2) {
+		super();
 		this.length1 = length1;
 		this.length2 = length2;
 		this.angle1 = angle1;
