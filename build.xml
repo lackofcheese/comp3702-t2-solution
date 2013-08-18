@@ -3,18 +3,19 @@
               Any modifications will be overwritten.
               To include a user specific buildfile here, simply create one in the same
               directory with the processing instruction <?eclipse.ant.import?>
-              as the first entry and export the buildfile again. --><project basedir="." default="build" name="comp3702-t1-solutions">
+              as the first entry and export the buildfile again. --><project basedir="." default="build" name="comp3702-t2-solution">
     <property environment="env"/>
     <property name="debuglevel" value="source,lines,vars"/>
     <property name="target" value="1.7"/>
     <property name="source" value="1.7"/>
-    <path id="comp3702-t1-solutions.classpath">
+    <path id="comp3702-t2-solution.classpath">
         <pathelement location="bin"/>
     </path>
     <target name="init">
         <mkdir dir="bin"/>
         <copy includeemptydirs="false" todir="bin">
             <fileset dir="src">
+                <exclude name="**/*.launch"/>
                 <exclude name="**/*.java"/>
             </fileset>
         </copy>
@@ -29,18 +30,19 @@
         <echo message="${ant.project.name}: ${ant.file}"/>
         <javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}">
             <src path="src"/>
-            <classpath refid="comp3702-t1-solutions.classpath"/>
+            <classpath refid="comp3702-t2-solution.classpath"/>
         </javac>
     </target>
     <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
-    <target name="EightPuzzleSolver (1)">
-        <java classname="tutorial1.eight.EightPuzzleSolver" failonerror="true" fork="yes">
-            <classpath refid="comp3702-t1-solutions.classpath"/>
+    <target name="RobotSolver">
+        <java classname="tutorial2.RobotSolver" failonerror="true" fork="yes">
+            <classpath refid="comp3702-t2-solution.classpath"/>
         </java>
     </target>
-    <target name="NavigationSolver">
-        <java classname="tutorial1.navigation.NavigationSolver" failonerror="true" fork="yes">
-            <classpath refid="comp3702-t1-solutions.classpath"/>
+    <target name="T2Visualiser">
+        <java classname="visualiser.Visualiser" failonerror="true" fork="yes">
+            <arg line="problem.txt solution.txt"/>
+            <classpath refid="comp3702-t2-solution.classpath"/>
         </java>
     </target>
 </project>
