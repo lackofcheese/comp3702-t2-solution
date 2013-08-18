@@ -7,8 +7,6 @@ import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
@@ -20,6 +18,7 @@ import javax.swing.Timer;
 import tutorial2.Obstacle;
 import tutorial2.ProblemSpec;
 import tutorial2.RobotArmState;
+import tutorial2.StateTools;
 
 public class VisualisationPanel extends JComponent {
 	/** UID, as required by Swing */
@@ -28,38 +27,26 @@ public class VisualisationPanel extends JComponent {
 	private ProblemSpec problemSpec = new ProblemSpec();
 	private Visualiser visualiser;
 	
-	private AffineTransform translation = AffineTransform.getTranslateInstance(0, -1);
+	private AffineTransform translation = AffineTransform.getTranslateInstance(1, -1);
 	private AffineTransform transform = null;
 	
 	private RobotArmState currentState;
 	private boolean animating = false;
 	private boolean displayingSolution = false;
 	private Timer animationTimer;
-	private int framePeriod = 20; // 50 FPS
+	
+	private int resolution; // # of frames per solution step.
+	private int framePeriod; // 1000 / framerate
 	private Integer frameNumber = null;
 	private int maxFrameNumber;
 	
-	private int samplingPeriod = 100;
-	
-	private class VisualisationListener implements ComponentListener {
-		@Override
-		public void componentResized(ComponentEvent e) {
-			calculateTransform();
-		}
-		@Override
-		public void componentHidden(ComponentEvent e) {}
-		@Override
-		public void componentMoved(ComponentEvent e) {}
-		@Override
-		public void componentShown(ComponentEvent e) {}
-	}
+	private int samplingPeriod;
 	
 	public VisualisationPanel(Visualiser visualiser) {
 		super();
 		this.setBackground(Color.WHITE);
 		this.setOpaque(true);
 		this.visualiser = visualiser;
-		this.addComponentListener(new VisualisationListener());
 	}
 	
 	public void setDisplayingSolution(boolean displayingSolution) {
@@ -72,12 +59,61 @@ public class VisualisationPanel extends JComponent {
 	}
 	
 	public void setFramerate(int framerate) {
-		this.framePeriod = 1000 / framerate;
+		boolean mustRestart = (framePeriod == Integer.MAX_VALUE);
+		if (framerate > 0) {
+			framePeriod = 1000 / framerate;	
+		} else {
+			framePeriod = Integer.MAX_VALUE;
+		}
 		if (animationTimer != null) {
+			if (mustRestart) {
+				animationTimer.stop();
+			}
 			animationTimer.setDelay(framePeriod);
+			if (mustRestart) {
+				animationTimer.start();
+			}
 		}
 	}
-
+	
+	public void setSamplingPeriod(int samplingPeriod) {
+		this.samplingPeriod = samplingPeriod;
+		if (displayingSolution) {
+			repaint();
+		}
+	}
+	
+	public void setResolution(int resolution) {
+		int oldResolution = this.resolution;
+		this.resolution = resolution;
+		if (!problemSpec.solutionLoaded()) {
+			return;
+		}
+		maxFrameNumber = resolution * (problemSpec.getPath().size() - 1);
+		if (!animating) {
+			return;
+		}
+		int newFrameNumber = (int)Math.round((double)frameNumber * resolution / oldResolution);
+		if (newFrameNumber > maxFrameNumber) {
+			newFrameNumber = maxFrameNumber;
+		}
+		if (resolution > oldResolution) {
+			visualiser.updateFrameSlider();
+			gotoFrame(newFrameNumber);
+		} else {
+			gotoFrame(newFrameNumber);
+			visualiser.updateFrameSlider();
+		}
+	}
+	
+	public int getResolution() {
+		return resolution;
+	}
+	
+	public int getMaxFrameNumber() {
+		return maxFrameNumber;
+	}
+	
 	public void initAnimation() {
 		if (!problemSpec.solutionLoaded()) {
 			return;
@@ -87,7 +123,7 @@ public class VisualisationPanel extends JComponent {
 		}
 		animating = true;
 		gotoFrame(0);
-		maxFrameNumber = problemSpec.getPath().size() - 1;
+		maxFrameNumber = resolution * (problemSpec.getPath().size() - 1);
 		animationTimer = new Timer(framePeriod, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -102,7 +138,19 @@ public class VisualisationPanel extends JComponent {
 			}
 		});
 		visualiser.setPlaying(false);
-		visualiser.updateMaximum();
+		visualiser.updateFrameSlider();
+	}
+	
+	public RobotArmState getState(int frameNumber) {
+		double stepIndex = ((double)frameNumber) / resolution;
+		int flooredIndex = (int)Math.floor(stepIndex);
+		if (flooredIndex == stepIndex) {
+			return problemSpec.getPath().get(flooredIndex);
+		} 
+		RobotArmState s0 = problemSpec.getPath().get(flooredIndex);
+		RobotArmState s1 = problemSpec.getPath().get(flooredIndex + 1);
+		double t = stepIndex - flooredIndex;
+		return StateTools.interpolate(s0, s1, t); 
 	}
 	
 	public void gotoFrame(int frameNumber) {
@@ -111,7 +159,7 @@ public class VisualisationPanel extends JComponent {
 		}
 		this.frameNumber = frameNumber;
 		visualiser.setFrameNumber(frameNumber);
-		currentState = problemSpec.getPath().get(frameNumber);
+		currentState = getState(frameNumber);
 		repaint();
 	}
 	
@@ -147,7 +195,7 @@ public class VisualisationPanel extends JComponent {
 	
 	public void calculateTransform() {
 		transform = AffineTransform.getScaleInstance(
-				getWidth(), -getHeight());
+				getWidth() / 2, -getHeight() / 2);
 		transform.concatenate(translation);
 	}
 	
@@ -168,16 +216,12 @@ public class VisualisationPanel extends JComponent {
 		g2.draw(path);
 	}
 	
-	public void setSamplingPeriod(int samplingPeriod) {
-		this.samplingPeriod = samplingPeriod;
-		repaint();
-	}
-	
 	public void paintComponent(Graphics graphics) {
 		super.paintComponent(graphics);
 		if (!problemSpec.problemLoaded()) {
 			return;
 		}
+		calculateTransform();
 		Graphics2D g2 = (Graphics2D)graphics;
 		g2.setColor(Color.WHITE);
 		g2.fillRect(0, 0, getWidth(), getHeight());
@@ -195,14 +239,13 @@ public class VisualisationPanel extends JComponent {
 		if (!animating) {
 			if (displayingSolution) {
 				List<RobotArmState> path = problemSpec.getPath();
-				int lastIndex = path.size() - 1;
-				for (int i = 0; i < lastIndex; i += samplingPeriod) {
-					float t = (float)i / lastIndex;
+				for (int i = 0; i < maxFrameNumber; i += samplingPeriod) {
+					float t = (float)i / maxFrameNumber;
 					g2.setColor(new Color(0, t, 1-t));
-					paintState(g2, path.get(i));
+					paintState(g2, getState(i));
 				}
 				g2.setColor(Color.green);
-				paintState(g2, path.get(lastIndex));
+				paintState(g2, getState(maxFrameNumber));
 			} else {
 				g2.setColor(Color.blue);	
 				paintState(g2, problemSpec.getInitialState());

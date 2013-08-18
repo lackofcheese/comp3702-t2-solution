@@ -58,6 +58,7 @@ public class Visualiser {
 	private JPanel animationControls;
 	private JSlider manualSlider;
 	private JSlider framerateSlider;
+	private JSpinner resolutionSpinner;
 	
 	private JSpinner samplingSpinner;
 	
@@ -81,11 +82,13 @@ public class Visualiser {
 	private boolean hasProblem;
 	private boolean hasSolution;
 	
-	private static final int FRAMERATE_MIN = 1;
+	private static final int FRAMERATE_MIN = 0;
 	private static final int FRAMERATE_MAX = 200;
 	private static final int FRAMERATE_INIT = 50;
 	
-	private static final int SAMPLING_PERIOD_INIT = 100;
+	private static final int RESOLUTION_INIT = 10;
+	
+	private static final int SAMPLING_PERIOD_INIT = 10;
 	
 	private File defaultPath;
 	
@@ -94,12 +97,16 @@ public class Visualiser {
 			String cmd = e.getActionCommand();
 			if (cmd.equals("Problem")) {
 				setAnimating(false);
-				vp.setDisplayingSolution(false);
 				setInfoText();
+				vp.setDisplayingSolution(false);
+				container.validate();
+				vp.repaint();
 			} else if (cmd.equals("Solution")) {
 				setAnimating(false);
-				vp.setDisplayingSolution(true);
 				setInfoText();
+				vp.setDisplayingSolution(true);
+				container.validate();
+				vp.repaint();
 			} else if (cmd.equals("Load problem")) {
 				setAnimating(false);
 				loadProblem();
@@ -175,6 +182,13 @@ public class Visualiser {
 		}
 	};
 	
+	private ChangeListener resolutionListener = new ChangeListener() {
+		@Override
+		public void stateChanged(ChangeEvent e) {
+			vp.setResolution(((Integer)resolutionSpinner.getValue()));
+		}
+	};
+	
 	private ChangeListener samplingListener = new ChangeListener() {
 		@Override
 		public void stateChanged(ChangeEvent e) {
@@ -223,9 +237,8 @@ public class Visualiser {
 				BorderFactory.createEtchedBorder(EtchedBorder.LOWERED)));
 		container.add(wp, BorderLayout.CENTER);
 		
-		//JPanel infoPanelWrapper = new JPanel(new BorderLayout());
 		infoPanel = new JPanel();
-		infoPanel.setLayout(new FlowLayout()); //(infoPanel, BoxLayout.LINE_AXIS));
+		infoPanel.setLayout(new FlowLayout());
 		
 		infoLabel = new JLabel("No problem to display.");
 		samplingSpinner = new JSpinner(new SpinnerNumberModel(SAMPLING_PERIOD_INIT, 1, null, 1));
@@ -236,7 +249,6 @@ public class Visualiser {
 		infoPanel.add(infoLabel);
 		infoPanel.add(samplingSpinner);
 		
-		//infoPanelWrapper.add(infoPanel, BorderLayout.CENTER);
 		container.add(infoPanel, BorderLayout.NORTH);
 		
 		createMenus();
@@ -340,7 +352,19 @@ public class Visualiser {
 		manualSlider.addChangeListener(manualSliderListener);
 		manualSlider.addMouseListener(manualSliderClickListener);
 		manualSlider.setMinorTickSpacing(1);
-		manualSlider.addComponentListener(resizeListener);
+		
+		JLabel resolutionLabel = new JLabel("Frames per step:");
+		resolutionSpinner = new JSpinner(new SpinnerNumberModel(RESOLUTION_INIT, 1, null, 1));
+		resolutionSpinner.addChangeListener(resolutionListener);
+		JPanel resolutionPanel = new JPanel();
+		resolutionPanel.setLayout(new BoxLayout(resolutionPanel, BoxLayout.PAGE_AXIS));
+		resolutionSpinner.setPreferredSize(new Dimension(40, 20));
+		resolutionSpinner.setMaximumSize(new Dimension(50, 20));
+		resolutionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+		resolutionSpinner.setAlignmentX(Component.CENTER_ALIGNMENT);
+		resolutionPanel.add(resolutionLabel);
+		resolutionPanel.add(Box.createRigidArea(new Dimension(0, 2)));
+		resolutionPanel.add(resolutionSpinner);
 	
 		JLabel framerateLabel = new JLabel("Framerate");
 		framerateLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -352,6 +376,7 @@ public class Visualiser {
 		framerateSlider.setLabelTable(framerateSlider.createStandardLabels(10, 10));
 		framerateSlider.setFont(sliderFont);
 		framerateSlider.addChangeListener(framerateListener);
+		framerateSlider.addComponentListener(resizeListener);
 		JPanel frameratePanel = new JPanel();
 		frameratePanel.setLayout(new BoxLayout(frameratePanel, BoxLayout.PAGE_AXIS));
 		frameratePanel.add(framerateLabel);
@@ -375,10 +400,17 @@ public class Visualiser {
 		p2.add(Box.createRigidArea(new Dimension(10, 0)));
 		p2.add(stopButton);
 		p2.add(frameratePanel);
+		p2.add(Box.createRigidArea(new Dimension(5, 0)));
+		p2.add(resolutionPanel);
 		animationControls.add(p2);
 		animationControls.setVisible(false);
 		animationControls.setBorder(BorderFactory.createEmptyBorder(0, 10, 5, 10));
 		container.add(animationControls, BorderLayout.SOUTH);
+		
+		vp.setFramerate(FRAMERATE_INIT);
+		vp.setResolution(RESOLUTION_INIT);
+		vp.setSamplingPeriod(SAMPLING_PERIOD_INIT);
+		updateFrameSlider();
 	}
 		
 	
@@ -487,6 +519,7 @@ public class Visualiser {
 		if (this.animating == animating) {
 			return;
 		}
+		updateFrameSlider();
 		this.animating = animating;
 		stopItem.setEnabled(animating);
 		animationControls.setVisible(animating);
@@ -511,16 +544,19 @@ public class Visualiser {
 		playPauseButton.repaint();
 	}
 	
-	public void updateMaximum() {
-		int maximum = vp.getProblemSetup().getPath().size() - 1;
+	public void updateFrameSlider() {
+		int maximum = vp.getMaxFrameNumber();
 		manualSlider.setMaximum(maximum);
-		updateTickSpacing();
+		int resolution = vp.getResolution();
+		manualSlider.setMajorTickSpacing(resolution);
+		manualSlider.setMinorTickSpacing(1);
+		manualSlider.setLabelTable(manualSlider.createStandardLabels(resolution));
 	}
 	
-	public void updateSliderSpacing(JSlider slider) {
+	public void updateSliderSpacing(JSlider slider, int baseSpacing) {
 		int width = slider.getBounds().width;
 		int max = slider.getMaximum();
-		int spacing = 1;
+		int spacing = baseSpacing;
 		int mode = 1;
 		double pxPerLabel = (double)width * spacing / max;
 		if (pxPerLabel <= 0) {
@@ -541,7 +577,9 @@ public class Visualiser {
 				mode = 1;
 			}
 		}
-		slider.setMajorTickSpacing(spacing);
+		if (baseSpacing == 1) {
+			slider.setMajorTickSpacing(spacing);
+		}
 		int min = slider.getMinimum();
 		if (min % spacing > 0) {
 			min += (spacing - (min % spacing));
@@ -550,8 +588,8 @@ public class Visualiser {
 	}
 	
 	public void updateTickSpacing() {
-		updateSliderSpacing(manualSlider);
-		updateSliderSpacing(framerateSlider);
+		updateSliderSpacing(manualSlider, vp.getResolution());
+		updateSliderSpacing(framerateSlider, 1);
 	}
 	
 	public void setFrameNumber(int frameNumber) {

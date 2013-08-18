@@ -4,6 +4,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import search.State;
 import search.algorithms.*;
@@ -27,8 +28,6 @@ public class RobotSolver {
 	 * @param numberToGenerate the number of states to generate.
 	 */
 	public static void generateStates(int numberToGenerate) {
-		states.add(ps.getInitialState());
-		states.add(ps.getGoalState());
 		for (int i = 0; i < numberToGenerate; i++) {
 			while (true) {
 				RobotArmState s = StateTools.createRandomState(ps.getLength1(), ps.getLength2());
@@ -52,6 +51,9 @@ public class RobotSolver {
 				RobotArmState s2 = states.get(j);
 				double totalAngleDelta = StateTools.totalAngleDelta(s1, s2);
 				if (totalAngleDelta > maxAngleDelta) {
+					continue;
+				}
+				if (!StateTools.hasDirectPath(s1, s2, ps.getObstacles())) {
 					continue;
 				}
 				s1.addSuccessor(s2, totalAngleDelta);
@@ -82,6 +84,10 @@ public class RobotSolver {
 	 * @param args if given, the input and output files to use.
 	 */
 	public static void main(String args[]) {
+		long seed = (new Random()).nextLong();
+		System.out.println("Seed: " + seed);
+		StateTools.setSeed(seed);
+		
 		String inputPath = DEFAULT_INPUT;
 		String outputPath = DEFAULT_OUTPUT;
 		if (args.length >= 1) {
@@ -97,28 +103,32 @@ public class RobotSolver {
 			e.printStackTrace();
 			return;
 		}
-		System.out.println(ps.getInitialState());
-		System.out.println(ps.getGoalState());
-		System.out.println(ps.getObstacles());
+		System.out.println("Init: " + ps.getInitialState());
+		System.out.println("Goal: " + ps.getGoalState());
+		System.out.println("Obs:  " + ps.getObstacles());
+		System.out.println();
 		
+		states.add(ps.getInitialState());
+		states.add(ps.getGoalState());
 		System.out.println("Generating states!");
-		generateStates(2000);
+		generateStates(10000);
 		System.out.println("Connecting graph!");
-		connectStates(200);
+		connectStates(10);
 		
-		@SuppressWarnings("unused")
 		Heuristic heuristic;
 		heuristic = new TotalAngleDeltaHeuristic(ps.getGoalState());
 		
 		AbstractSearchAlgorithm algo;
 		//algo = new DepthFirstSearch(initialState, goalState);
-		//algo = new DepthLimitedSearch(26, initialState, goalState);
+		//algo = new DepthLimitedSearch(10, initialState, goalState);
 		//algo = new IterativeDeepeningSearch(initialState, goalState);
 		
 		//algo = new BreadthFirstSearch(initialState, goalState);
 		algo = new AStarSearch(ps.getInitialState(), ps.getGoalState(), heuristic);
 		
 		System.out.println("Searching!");
+		System.out.println();
+		
 		algo.verboseSearch();
 		if (algo.goalFound()) {
 			List<RobotArmState> path = new ArrayList<RobotArmState>();
