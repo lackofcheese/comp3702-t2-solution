@@ -97,15 +97,13 @@ public class Visualiser {
 			String cmd = e.getActionCommand();
 			if (cmd.equals("Problem")) {
 				setAnimating(false);
-				setInfoText();
 				vp.setDisplayingSolution(false);
-				container.validate();
+				setInfoText();
 				vp.repaint();
 			} else if (cmd.equals("Solution")) {
 				setAnimating(false);
-				setInfoText();
 				vp.setDisplayingSolution(true);
-				container.validate();
+				setInfoText();
 				vp.repaint();
 			} else if (cmd.equals("Load problem")) {
 				setAnimating(false);
