@@ -12,8 +12,9 @@ public class RobotArmState extends StateWithMap {
 	private double angle1;
 	private double angle2;
 	private List<Point2D> points;
-	
-	public RobotArmState(double length1, double length2, double angle1, double angle2) {
+
+	public RobotArmState(double length1, double length2, double angle1,
+			double angle2) {
 		super();
 		this.length1 = length1;
 		this.length2 = length2;
@@ -29,34 +30,33 @@ public class RobotArmState extends StateWithMap {
 		y += length2 * (Math.sin(angle1 + angle2));
 		points.add(new Point2D.Double(x, y));
 	}
-	
-	public boolean equals (Object obj) {
+
+	public boolean equals(Object obj) {
 		if (obj == null || !(obj instanceof RobotArmState)) {
 			return false;
 		}
-		RobotArmState rs2 = (RobotArmState)obj;
+		RobotArmState rs2 = (RobotArmState) obj;
 		return (this.angle1 == rs2.angle1 && this.angle2 == rs2.angle2);
 	}
-	
+
 	public String toString() {
-		return String.format("(%.1f<%.1f°, %.1f<%.1f°)", 
-				length1, Math.toDegrees(angle1), 
-				length2, Math.toDegrees(angle2));
+		return String.format("(%.1f<%.1f°, %.1f<%.1f°)", length1,
+				Math.toDegrees(angle1), length2, Math.toDegrees(angle2));
 	}
 
 	public int hashCode() {
-		return Double.valueOf(angle1).hashCode() + 7 * Double.valueOf(angle2).hashCode();
+		return Double.valueOf(angle1).hashCode() + 7
+				* Double.valueOf(angle2).hashCode();
 	}
-	
-	
+
 	public double getLength1() {
 		return length1;
 	}
-	
+
 	public double getLength2() {
 		return length2;
 	}
-	
+
 	public double getAngle1() {
 		return angle1;
 	}
@@ -64,7 +64,7 @@ public class RobotArmState extends StateWithMap {
 	public double getAngle2() {
 		return angle2;
 	}
-	
+
 	public List<Point2D> getPoints() {
 		return new ArrayList<Point2D>(points);
 	}
