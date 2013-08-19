@@ -80,10 +80,10 @@ public class RobotSolver {
 			throws IOException {
 		FileWriter writer = new FileWriter(outputPath);
 		for (RobotArmState s : path) {
-			writer.write(String.format("%.3f %.3f\n",
+			writer.write(String.format("%.3f %.3f%s",
 					Math.toDegrees(s.getAngle1()),
-					Math.toDegrees(s.getAngle2())));
-
+					Math.toDegrees(s.getAngle2()),
+					System.getProperty("line.separator")));
 		}
 		writer.close();
 	}
