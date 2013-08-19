@@ -4,7 +4,6 @@ Tutorial 2 solution by Dimitri Klimenko (tutor).
 (1) Commands and arguments.
 The runnable files and their arguments are
     tutorial2.RobotSolver [input-file] [output-file]
-and
     visualiser.Visualiser [problem-file] [solution-file]
 
 
