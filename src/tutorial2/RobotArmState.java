@@ -38,7 +38,7 @@ public class RobotArmState extends StateWithMap {
 		this.angle1 = angle1;
 		this.angle2 = angle2;
 		points = new ArrayList<Point2D>();
-		double x = 0, y = 0;
+		double x = 0.5, y = 0.5;
 		points.add(new Point2D.Double(x, y));
 		x += length1 * Math.cos(angle1);
 		y += length1 * Math.sin(angle1);

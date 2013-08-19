@@ -28,7 +28,7 @@ public class VisualisationPanel extends JComponent {
 	private Visualiser visualiser;
 
 	private AffineTransform translation = AffineTransform.getTranslateInstance(
-			1, -1);
+			0, -1);
 	private AffineTransform transform = null;
 
 	private RobotArmState currentState;
@@ -197,8 +197,8 @@ public class VisualisationPanel extends JComponent {
 	}
 
 	public void calculateTransform() {
-		transform = AffineTransform.getScaleInstance(getWidth() / 2,
-				-getHeight() / 2);
+		transform = AffineTransform.getScaleInstance(getWidth(),
+				-getHeight());
 		transform.concatenate(translation);
 	}
 

@@ -85,7 +85,7 @@ public class StateTools {
 	public static boolean isValidState(RobotArmState s, List<Obstacle> obstacles) {
 		for (Point2D p : s.getPoints()) {
 			for (double coord : new double[] { p.getX(), p.getY() }) {
-				if (coord < -1 || coord > 1) {
+				if (coord < 0 || coord > 1) {
 					return false;
 				}
 			}
