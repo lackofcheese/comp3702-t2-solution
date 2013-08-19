@@ -34,8 +34,15 @@
         </javac>
     </target>
     <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
-    <target name="Visualiser (2)">
+    <target name="T2 Solver">
+        <java classname="tutorial2.RobotSolver" failonerror="true" fork="yes">
+            <arg line="problem.txt solution.txt"/>
+            <classpath refid="t2-bundle.classpath"/>
+        </java>
+    </target>
+    <target name="T2 Visualiser">
         <java classname="visualiser.Visualiser" failonerror="true" fork="yes">
+            <arg line="problem.txt solution.txt"/>
             <classpath refid="t2-bundle.classpath"/>
         </java>
     </target>
