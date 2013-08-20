@@ -59,7 +59,7 @@ public class RobotArmState extends StateWithMap {
 
 	@Override
 	public String toString() {
-		return String.format("(%.1f<%.1f°, %.1f<%.1f°)", length1,
+		return String.format("(%.1f<%.1fdeg, %.1f<%.1fdeg)", length1,
 				Math.toDegrees(angle1), length2, Math.toDegrees(angle2));
 	}
 
