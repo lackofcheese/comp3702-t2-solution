@@ -7,7 +7,7 @@ import java.util.Random;
 
 public class StateTools {
 	/** The random number generator */
-	public static final Random random = new Random();
+	private static final Random random = new Random();
 
 	/** Sets the seed for RNG */
 	public static void setSeed(long seed) {

@@ -4,6 +4,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 /**
@@ -39,7 +40,7 @@ public class Obstacle {
 	 * 
 	 * @param str
 	 */
-	public Obstacle(String str) {
+	public Obstacle(String str) throws NoSuchElementException {
 		Scanner s = new Scanner(str);
 		List<Double> xs = new ArrayList<Double>();
 		List<Double> ys = new ArrayList<Double>();
